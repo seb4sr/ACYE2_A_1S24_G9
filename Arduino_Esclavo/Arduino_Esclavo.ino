@@ -1,8 +1,12 @@
+#include "Wire.h"
 #define s0 4
 #define s1 5
 #define s2 6
 #define s3 7
 #define salidaTCS 8
+bool cont = true;
+byte CODE;
+byte entra = 0;
 
 void setup() {
   pinMode(s0, OUTPUT);
@@ -15,6 +19,10 @@ void setup() {
   digitalWrite(s1, LOW);
 
   Serial.begin(9600);
+
+  Wire.begin(0x01);
+  Wire.onReceive(EntradaSolicitud);
+  Wire.onRequest(Peticion);
 }
 
 void loop() {
@@ -48,13 +56,27 @@ void loop() {
 
   Serial.print("\n");
 
-  if ( rojo >= 203 && rojo <= 212 && verde >= 65 && verde <= 68 && azul >= 65 && azul <= 68){
-    Serial.println("VERDE");
-  }
-    else if ( rojo >= 198 &&  rojo <= 209 && verde >= 55 &&  verde <= 62 && azul >= 60 &&  azul <= 62){
+  if (rojo >= 420 && rojo <= 530 && verde >= 200 && verde <= 350 && azul >= 200 && azul <= 250) {
+    Serial.println("ROJO");
+    CODE = 1;
+  } else if (rojo >= 700 && rojo <= 810 && verde >= 155 && verde <= 200 && azul >= 155 && azul <= 195) {
     Serial.println("CELESTE");
-  }  
-    else if ( rojo >= 150 &&  rojo <= 160 && verde >= 58 &&  verde <= 61 && azul >= 58 &&  azul <= 61){
+    CODE = 2;
+  } else if (rojo >= 340 && rojo <= 400 && verde >= 115 && verde <= 160 && azul >= 115 && azul <= 150) {
     Serial.println("AMARILLO");
+    CODE = 3;
   }
- }
+}
+
+//-------EVENTO DE ENTRADA--- ENVIADO POR EL MAESTRO---
+void EntradaSolicitud(int re) {
+  while (Wire.available()) {
+    entra = Wire.read();
+  }
+  Serial.println(entra);
+}
+//-----EVENTO DE PETICIÓN--- SOLICITADO POR EL MAESTRO---
+void Peticion() {
+  Serial.println(CODE);
+  Wire.write(CODE);
+}

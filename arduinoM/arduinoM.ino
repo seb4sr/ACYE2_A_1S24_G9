@@ -11,20 +11,25 @@ int pasosVuelta = 2048;
 bool vuelt = true;
 int i = 0;
 int btnEmergencia = 12;
+int CR = 0;
+int CAZ = 0;
+int CA = 0;
 
 Stepper motor(pasosVuelta, 8, 10, 9, 11);
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // Pines de los botones
-const int btnUpPin = 5;
-const int btnDownPin = 4;
-const int btnSelectPin = 3;
-const int btnBackPin = 2;
+const int btnUpPin = 2;
+const int btnDownPin = 3;
+const int btnSelectPin = 4;
+const int btnBackPin = 5;
 
 int estado = 1;
+byte CODE;
 
 void setup() {
+  Wire.begin();
   Serial.begin(9600);
   motor.setSpeed(15);
   pinMode(trigPin, OUTPUT);
@@ -91,8 +96,19 @@ void loop() {
     lcd.setCursor(0, 0);
     lcd.print("Contador: ");
     lcd.setCursor(0, 1);
-    lcd.print("NUMERO");
+    lcd.print("ROJO: ");
+    lcd.print(CR);
     estado = 5;
+    delay(300);
+  } else if (estado == 5 && digitalRead(btnDownPin) == LOW) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("CELESTE: ");
+    lcd.print(CAZ);
+    lcd.setCursor(0, 1);
+    lcd.print("AMARILLO: ");
+    lcd.print(CA);
+    estado = 12;
     delay(300);
   } else if (estado == 2 && digitalRead(btnSelectPin) == LOW) {
     lcd.clear();
@@ -131,6 +147,23 @@ void loop() {
     lcd.setCursor(1, 1);
     lcd.print("Filtro");
     estado = 1;
+    delay(300);
+  } else if (estado == 12 && digitalRead(btnBackPin) == LOW) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(">Histrorial");
+    lcd.setCursor(1, 1);
+    lcd.print("Filtro");
+    estado = 1;
+    delay(300);
+  } else if (estado == 12 && digitalRead(btnUpPin) == LOW) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Contador: ");
+    lcd.setCursor(0, 1);
+    lcd.print("ROJO: ");
+    lcd.print(CR);
+    estado = 5;
     delay(300);
   } else if (estado == 6 && digitalRead(btnBackPin) == LOW) {
     lcd.clear();
@@ -213,12 +246,29 @@ void loop() {
         break;
       } else {
         motor.step(-pasosVuelta);
-        i += 1;
+        if (i == 0) {
+          delay(5000);
+          Wire.requestFrom(0x01, 1);
+          while (Wire.available()) {
+            CODE = Wire.read();
+          }
+        }
       }
+      i += 1;
     }
+    Serial.println(CODE);
+    if (CODE == 1){
+      CR = CR+1;
+    }else if (CODE == 2){
+      CAZ = CAZ+1;
+    }else if (CODE == 3){
+      CA = CA+1;
+    }
+
     delay(5000);
     Serial.println("se logra");
     i = 0;
+    delay(10000);
   }
 }
 
