@@ -26,7 +26,8 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(s2, LOW);
+  if (entra == 0){
+    digitalWrite(s2, LOW);
   digitalWrite(s2, LOW);
   int rojo = pulseIn(salidaTCS, LOW);
   delay(200);
@@ -66,6 +67,9 @@ void loop() {
     Serial.println("AMARILLO");
     CODE = 3;
   }
+  }else{
+    CODE = 4;
+  }
 }
 
 //-------EVENTO DE ENTRADA--- ENVIADO POR EL MAESTRO---
@@ -73,6 +77,7 @@ void EntradaSolicitud(int re) {
   while (Wire.available()) {
     entra = Wire.read();
   }
+  Serial.print("entra ");
   Serial.println(entra);
 }
 //-----EVENTO DE PETICIÓN--- SOLICITADO POR EL MAESTRO---

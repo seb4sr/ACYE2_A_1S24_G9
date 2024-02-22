@@ -27,6 +27,7 @@ const int btnBackPin = 5;
 
 int estado = 1;
 byte CODE;
+byte filtro = 0;
 
 void setup() {
   Wire.begin();
@@ -56,6 +57,10 @@ void setup() {
   lcd.print(">Histrorial");
   lcd.setCursor(1, 1);
   lcd.print("Filtro");
+  Wire.beginTransmission(0x01);
+  Wire.write(filtro);
+  Wire.endTransmission();
+
 }
 
 void loop() {
@@ -194,11 +199,19 @@ void loop() {
     lcd.setCursor(0, 0);
     lcd.print("Filtro: Color");
     estado = 10;
+    filtro = 0;
+    Wire.beginTransmission(0x01);
+    Wire.write(filtro);
+    Wire.endTransmission();
     delay(300);
   } else if (estado == 7 && digitalRead(btnSelectPin) == LOW) {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Filtro: Size");
+    filtro = 1;
+    Wire.beginTransmission(0x01);
+    Wire.write(filtro);
+    Wire.endTransmission();
     estado = 11;
     delay(300);
   } else if (estado == 10 && digitalRead(btnBackPin) == LOW) {
@@ -257,18 +270,20 @@ void loop() {
       i += 1;
     }
     Serial.println(CODE);
-    if (CODE == 1){
-      CR = CR+1;
-    }else if (CODE == 2){
-      CAZ = CAZ+1;
-    }else if (CODE == 3){
-      CA = CA+1;
+    if (CODE == 1) {
+      CR = CR + 1;
+    } else if (CODE == 2) {
+      CAZ = CAZ + 1;
+    } else if (CODE == 3) {
+      CA = CA + 1;
+    }else if (CODE == 4){
+      Serial.println("Size");
     }
 
-    delay(5000);
-    Serial.println("se logra");
+    delay(500);
+    //Serial.println("se logra");
     i = 0;
-    delay(10000);
+    delay(100);
   }
 }
 
