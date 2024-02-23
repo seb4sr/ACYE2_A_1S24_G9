@@ -3,6 +3,13 @@
 #include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
 
+#define motorpin1 A3
+#define motorpin2 A2
+#define motorpin3 A1
+#define motorpin4 A0
+
+#define motorsteps 200
+Stepper motorder(motorsteps, motorpin1, motorpin3, motorpin2, motorpin4);
 
 int trigPin = 7;
 int echoPin = 6;
@@ -73,6 +80,12 @@ void setup() {
   Wire.beginTransmission(0x01);
   Wire.write(filtro);
   Wire.endTransmission();
+
+  motorder.setSpeed(15);
+  pinMode(motorpin1, OUTPUT);
+  pinMode(motorpin2, OUTPUT);
+  pinMode(motorpin3, OUTPUT);
+  pinMode(motorpin4, OUTPUT);
 }
 
 void loop() {
@@ -114,7 +127,7 @@ void loop() {
       lcd.setCursor(0, 0);
       lcd.print("Contador: ");
       lcd.setCursor(0, 1);
-      lcd.print("ROJO: ");
+      lcd.print("VERDE: ");
       lcd.print(CR);
     } else {
       lcd.setCursor(0, 0);
@@ -178,12 +191,12 @@ void loop() {
     EEPROM.write(3, 0);
     EEPROM.write(4, 0);
     EEPROM.write(5, 0);
-    CR =0;
-    CAZ =0;
+    CR = 0;
+    CAZ = 0;
     CA = 0;
     G = 0;
-    M =0;
-    P=0;
+    M = 0;
+    P = 0;
     estado = 9;
     delay(300);
   } else if (estado == 5 && digitalRead(btnBackPin) == LOW) {
@@ -300,17 +313,38 @@ void loop() {
         break;
       } else {
         motor.step(-pasosVuelta);
-        if (i == 0 && filtro ==0) {
+        if (i == 0 && filtro == 0) {
           delay(5000);
           Wire.requestFrom(0x01, 1);
           while (Wire.available()) {
             CODE = Wire.read();
           }
-        }else if (i==1 && filtro == 1){
+          if (CODE == 1) {
+            CR = CR + 1;
+            EEPROM.write(0, CR);
+          } else if (CODE == 2) {
+            CAZ = CAZ + 1;
+            EEPROM.write(1, CAZ);
+            motorder1();
+          } else if (CODE == 3) {
+            CA = CA + 1;
+            EEPROM.write(2, CA);
+          }
+        } else if (i == 1 && filtro == 1) {
           delay(5000);
           Wire.requestFrom(0x01, 1);
           while (Wire.available()) {
             CODE = Wire.read();
+          }
+          if (CODE == 4) {
+            G = G + 1;
+            EEPROM.write(3, G);
+          } else if (CODE == 5) {
+            M = M + 1;
+            EEPROM.write(4, M);
+          } else if (CODE == 6) {
+            P = P + 1;
+            EEPROM.write(5, P);
           }
         }
       }
@@ -323,18 +357,10 @@ void loop() {
     } else if (CODE == 2) {
       CAZ = CAZ + 1;
       EEPROM.write(1, CAZ);
+      motorder2();
     } else if (CODE == 3) {
       CA = CA + 1;
       EEPROM.write(2, CA);
-    } else if (CODE == 4) {
-      G = G + 1;
-      EEPROM.write(3, G);
-    } else if (CODE == 5) {
-      M = M + 1;
-      EEPROM.write(4, M);
-    } else if (CODE == 6) {
-      P = P + 1;
-      EEPROM.write(5, P);
     }
 
     delay(500);
@@ -361,4 +387,13 @@ int Sensor() {
     Serial.println("Ningún objeto detectado");
     return false;
   }
+}
+
+void motorder1() {
+  motorder.step(-200);
+  delay(1000);
+}
+void motorder2() {
+  motorder.step(200);
+  delay(1000);
 }
