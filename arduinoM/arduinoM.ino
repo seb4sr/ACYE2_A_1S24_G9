@@ -1,6 +1,8 @@
 #include <Stepper.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <EEPROM.h>
+
 
 int trigPin = 7;
 int echoPin = 6;
@@ -14,6 +16,9 @@ int btnEmergencia = 12;
 int CR = 0;
 int CAZ = 0;
 int CA = 0;
+int G = 0;
+int M = 0;
+int P = 0;
 
 Stepper motor(pasosVuelta, 8, 10, 9, 11);
 
@@ -36,6 +41,14 @@ void setup() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(btnEmergencia, INPUT_PULLUP);
+
+  CR = EEPROM.read(0);
+  CAZ = EEPROM.read(1);
+  CA = EEPROM.read(2);
+
+  G = EEPROM.read(3);
+  M = EEPROM.read(4);
+  P = EEPROM.read(5);
 
   pinMode(btnUpPin, INPUT_PULLUP);
   pinMode(btnDownPin, INPUT_PULLUP);
@@ -60,7 +73,6 @@ void setup() {
   Wire.beginTransmission(0x01);
   Wire.write(filtro);
   Wire.endTransmission();
-
 }
 
 void loop() {
@@ -98,21 +110,38 @@ void loop() {
     delay(300);
   } else if (estado == 1 && digitalRead(btnSelectPin) == LOW) {
     lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Contador: ");
-    lcd.setCursor(0, 1);
-    lcd.print("ROJO: ");
-    lcd.print(CR);
+    if (filtro == 0) {
+      lcd.setCursor(0, 0);
+      lcd.print("Contador: ");
+      lcd.setCursor(0, 1);
+      lcd.print("ROJO: ");
+      lcd.print(CR);
+    } else {
+      lcd.setCursor(0, 0);
+      lcd.print("Contador: ");
+      lcd.setCursor(0, 1);
+      lcd.print("GRANDE: ");
+      lcd.print(G);
+    }
     estado = 5;
     delay(300);
   } else if (estado == 5 && digitalRead(btnDownPin) == LOW) {
     lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("CELESTE: ");
-    lcd.print(CAZ);
-    lcd.setCursor(0, 1);
-    lcd.print("AMARILLO: ");
-    lcd.print(CA);
+    if (filtro == 0) {
+      lcd.setCursor(0, 0);
+      lcd.print("CELESTE: ");
+      lcd.print(CAZ);
+      lcd.setCursor(0, 1);
+      lcd.print("AMARILLO: ");
+      lcd.print(CA);
+    } else {
+      lcd.setCursor(0, 0);
+      lcd.print("MEDIANO: ");
+      lcd.print(M);
+      lcd.setCursor(0, 1);
+      lcd.print("PEQUENO: ");
+      lcd.print(P);
+    }
     estado = 12;
     delay(300);
   } else if (estado == 2 && digitalRead(btnSelectPin) == LOW) {
@@ -143,6 +172,18 @@ void loop() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Se Reseteo");
+    EEPROM.write(0, 0);
+    EEPROM.write(1, 0);
+    EEPROM.write(2, 0);
+    EEPROM.write(3, 0);
+    EEPROM.write(4, 0);
+    EEPROM.write(5, 0);
+    CR =0;
+    CAZ =0;
+    CA = 0;
+    G = 0;
+    M =0;
+    P=0;
     estado = 9;
     delay(300);
   } else if (estado == 5 && digitalRead(btnBackPin) == LOW) {
@@ -259,7 +300,13 @@ void loop() {
         break;
       } else {
         motor.step(-pasosVuelta);
-        if (i == 0) {
+        if (i == 0 && filtro ==0) {
+          delay(5000);
+          Wire.requestFrom(0x01, 1);
+          while (Wire.available()) {
+            CODE = Wire.read();
+          }
+        }else if (i==1 && filtro == 1){
           delay(5000);
           Wire.requestFrom(0x01, 1);
           while (Wire.available()) {
@@ -272,12 +319,22 @@ void loop() {
     Serial.println(CODE);
     if (CODE == 1) {
       CR = CR + 1;
+      EEPROM.write(0, CR);
     } else if (CODE == 2) {
       CAZ = CAZ + 1;
+      EEPROM.write(1, CAZ);
     } else if (CODE == 3) {
       CA = CA + 1;
-    }else if (CODE == 4){
-      Serial.println("Size");
+      EEPROM.write(2, CA);
+    } else if (CODE == 4) {
+      G = G + 1;
+      EEPROM.write(3, G);
+    } else if (CODE == 5) {
+      M = M + 1;
+      EEPROM.write(4, M);
+    } else if (CODE == 6) {
+      P = P + 1;
+      EEPROM.write(5, P);
     }
 
     delay(500);

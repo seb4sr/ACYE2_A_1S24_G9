@@ -4,6 +4,7 @@
 #define s2 6
 #define s3 7
 #define salidaTCS 8
+
 bool cont = true;
 byte CODE;
 byte entra = 0;
@@ -11,6 +12,9 @@ byte entra = 0;
 int trigPin = 12;
 int echoPin = 11;
 int pingTravelTime;
+
+
+
 
 void setup() {
   pinMode(s0, OUTPUT);
@@ -63,13 +67,13 @@ void loop() {
 
     Serial.print("\n");
 
-    if (rojo >= 420 && rojo <= 530 && verde >= 200 && verde <= 350 && azul >= 200 && azul <= 250) {
-      Serial.println("ROJO");
+    if (rojo >= 140 && rojo <= 155 && verde >= 45 && verde <= 55 && azul >= 47 && azul <= 55) {
+      Serial.println("VERDE");
       CODE = 1;
-    } else if (rojo >= 700 && rojo <= 810 && verde >= 155 && verde <= 200 && azul >= 155 && azul <= 195) {
+    } else if (rojo >= 220 && rojo <= 260 && verde >= 45 && verde <= 65 && azul >= 50 && azul <= 63) {
       Serial.println("CELESTE");
       CODE = 2;
-    } else if (rojo >= 340 && rojo <= 400 && verde >= 115 && verde <= 160 && azul >= 115 && azul <= 150) {
+    } else if (rojo >= 95 && rojo <= 110 && verde >= 40 && verde <= 50 && azul >= 40 && azul <= 50) {
       Serial.println("AMARILLO");
       CODE = 3;
     }
@@ -82,12 +86,15 @@ void loop() {
     digitalWrite(trigPin, LOW);
     Serial.println(pingTravelTime);
 
-    if(pingTravelTime >= 150 && pingTravelTime <= 295){
+    if(pingTravelTime >= 150 && pingTravelTime <= 210){
       Serial.println("GRANDE");
-    }else if (pingTravelTime >= 300 && pingTravelTime<= 350){
+      CODE = 4;
+    }else if (pingTravelTime >= 240 && pingTravelTime<= 290){
       Serial.println("MEDIANO");
+      CODE = 5;
     }else if (pingTravelTime>=420 && pingTravelTime<= 500){
       Serial.println("PEQUENO");
+      CODE = 6;
     }
   }
 }
