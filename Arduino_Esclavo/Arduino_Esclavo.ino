@@ -67,13 +67,13 @@ void loop() {
 
     Serial.print("\n");
 
-    if (rojo >= 140 && rojo <= 155 && verde >= 45 && verde <= 55 && azul >= 47 && azul <= 55) {
+    if (rojo >= 180 && rojo <= 245 && verde >= 45 && verde <= 80 && azul >= 65 && azul <= 75) {
       Serial.println("VERDE");
       CODE = 1;
-    } else if (rojo >= 220 && rojo <= 260 && verde >= 45 && verde <= 65 && azul >= 50 && azul <= 63) {
+    } else if (rojo >= 370 && rojo <= 470 && verde >= 85 && verde <= 130 && azul >= 100 && azul <= 120) {
       Serial.println("CELESTE");
       CODE = 2;
-    } else if (rojo >= 95 && rojo <= 110 && verde >= 40 && verde <= 50 && azul >= 40 && azul <= 50) {
+    } else if (rojo >= 150 && rojo <= 179 && verde >= 50 && verde <= 80 && azul >= 60 && azul <= 80) {
       Serial.println("AMARILLO");
       CODE = 3;
     }

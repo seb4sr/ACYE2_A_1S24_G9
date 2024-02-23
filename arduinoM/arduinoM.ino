@@ -287,7 +287,7 @@ void loop() {
   }
 
   if (Sensor()) {
-    while (i < 8) {
+    while (i < 10) {
       if (digitalRead(btnEmergencia) == LOW) {
         Serial.println("Emergencia");
 
@@ -390,10 +390,10 @@ int Sensor() {
 }
 
 void motorder1() {
-  motorder.step(-200);
+  motorder.step(-260);
   delay(1000);
 }
 void motorder2() {
-  motorder.step(200);
+  motorder.step(260);
   delay(1000);
 }
