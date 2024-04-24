@@ -69,7 +69,7 @@ void setup() {
   lcd.print("<Grupo9_A_1S24>");
   lcd.setCursor(3, 1);
   lcd.print("Practica 2");
-  delay(1000);
+  delay(20000);
 
   lcd.clear();
 
@@ -291,7 +291,7 @@ void loop() {
       if (digitalRead(btnEmergencia) == LOW) {
         Serial.println("Emergencia");
 
-        for (int i = 5; i > 0; i--) {
+        for (int i = 30; i > 0; i--) {
           Serial.print(i);
           lcd.clear();
           lcd.setCursor(0, 0);
